@@ -1,8 +1,10 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, Bot, CalendarCheck, CheckCircle, CheckCircle2, Flame, Mail, Mic, Sparkles, Star, X, Zap } from 'lucide-react'
 import { BrandDots, IconStack } from '../components/brand/BrandMarks'
 import { PortfolioSidebar } from '../components/brand/PortfolioSidebar'
+import { useAuthStore } from '../stores/authStore'
+import { PaymentModal } from '../components/payment/PaymentModal'
 
 const NAV = [
   {
@@ -155,6 +157,18 @@ const PLANS = [
 ]
 
 export default function LandingPage() {
+  const [payModal, setPayModal] = useState<{ plan: string; price: string } | null>(null)
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated)
+  const navigate = useNavigate()
+
+  const handlePlanClick = (plan: { name: string; price: string; ctaTo: string }) => {
+    if (isAuthenticated) {
+      setPayModal({ plan: plan.name, price: plan.price })
+    } else {
+      navigate('/register')
+    }
+  }
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 })
     // handle direct hash navigation on load
@@ -219,14 +233,15 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="section-band soft-panel">
+        <section className="section-band how-section">
+          <div className="how-orb how-orb-1" /><div className="how-orb how-orb-2" /><div className="how-orb how-orb-3" />
           <div className="other-projects">
-            <h2>other</h2>
+            <h2 className='text-white font-bold'>other</h2>
             <div>
               <IconStack />
               <Link to="/tasks" className="black-button">view all flows</Link>
             </div>
-            <h2>plans</h2>
+            <h2 className='text-white'>plans</h2>
           </div>
         </section>
 
@@ -236,7 +251,7 @@ export default function LandingPage() {
           </h2>
 
           <article className="letter-panel">
-            <img className="avatar-pin" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80" alt="Builder portrait" />
+            <img className="avatar-pin" src="src/assets/lp.jpeg" alt="Builder portrait" />
             <h2>our journey &amp; vision</h2>
             <p className="accent-text" style={{ fontSize: 28, marginBottom: 70 }}>a note from the builder</p>
             <p>dear friends,</p>
@@ -276,9 +291,13 @@ export default function LandingPage() {
         </section>
 
         {/* How it works */}
-        <section className="section-band soft-panel">
-          <h2 className="headline" style={{ fontSize: 'clamp(38px, 4vw, 62px)', marginBottom: 8 }}>how it works</h2>
-          <p style={{ color: 'var(--gray)', fontSize: 18 }}>four steps from chaos to a clear plan</p>
+        <section className="section-band how-section">
+          <div className="how-orb how-orb-1" />
+          <div className="how-orb how-orb-2" />
+          <div className="how-orb how-orb-3" />
+          <p className="section-label" style={{ color: 'rgba(255,255,255,0.55)', marginBottom: 10 }}>the process</p>
+          <h2 className="headline" style={{ fontSize: 'clamp(38px, 4vw, 62px)', marginBottom: 8, color: '#fff' }}>how it works</h2>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 18, marginBottom: 0 }}>four steps from chaos to a clear plan</p>
           <div className="how-grid">
             {HOW_STEPS.map(({ num, title, desc }) => (
               <div className="how-step" key={num}>
@@ -334,7 +353,7 @@ export default function LandingPage() {
           <h2 className="headline" style={{ textAlign: 'center', fontSize: 'clamp(40px, 4vw, 62px)' }}>hear from users who<br />shipped on time</h2>
           <div className="rating-box">
             <strong>4.8<span style={{ fontSize: 14 }}>/5</span></strong>
-            <span style={{ color: 'var(--sidebar)', display: 'flex', gap: 3 }}><Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /></span>
+            <span style={{ color: 'var(--yellow)', display: 'flex', gap: 3 }}><Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /> <Star size={18} fill="currentColor" /></span>
             <span>early users who finished the week with a plan instead of panic.</span>
           </div>
         </section>
@@ -362,13 +381,13 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to={plan.ctaTo}
+                <button
+                  onClick={() => handlePlanClick(plan)}
                   className={plan.featured ? 'yellow-button' : 'black-button'}
-                  style={{ textAlign: 'center', justifyContent: 'center' }}
+                  style={{ textAlign: 'center', justifyContent: 'center', width: '100%', cursor: 'pointer' }}
                 >
-                  {plan.cta}
-                </Link>
+                  {isAuthenticated ? `buy ${plan.name}` : plan.cta}
+                </button>
               </article>
             ))}
           </div>
@@ -423,6 +442,14 @@ export default function LandingPage() {
           </footer>
         </section>
       </main>
+      {payModal && (
+        <PaymentModal
+          plan={payModal.plan}
+          price={payModal.price}
+          onClose={() => setPayModal(null)}
+          onSuccess={() => { setPayModal(null); navigate('/dashboard') }}
+        />
+      )}
     </div>
   )
 }

@@ -1,23 +1,30 @@
 import { Award } from 'lucide-react'
 import { useGamificationProfile } from '../../hooks/useAnalytics'
-import { Badge } from '../ui/Badge'
-import { Skeleton } from '../ui/Skeleton'
 
 export function BadgeList() {
-  const { data, isLoading } = useGamificationProfile()
+  const { data, isLoading, isError } = useGamificationProfile()
 
-  if (isLoading) return <Skeleton className="h-12 w-full" />
-  if (!data || data.badges.length === 0) {
-    return <p className="text-sm text-text">No badges yet — complete tasks to earn some.</p>
+  if (isLoading) return <div className="skeleton" style={{ height: 48, borderRadius: 10 }} />
+  if (isError) return <p style={{ fontSize: 13, color: 'var(--danger)' }}>Could not load badges.</p>
+  if (!data || !data.badges || data.badges.length === 0) {
+    return <p style={{ fontSize: 13, color: 'var(--gray)' }}>No badges yet — complete tasks to earn some.</p>
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       {data.badges.map((badge) => (
-        <Badge key={badge} tone="accent" className="gap-1">
+        <span
+          key={badge}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '4px 12px', borderRadius: 100,
+            background: 'var(--cream-dark)', border: '1.5px solid var(--border)',
+            fontSize: 12, fontWeight: 700, color: 'var(--sidebar)',
+          }}
+        >
           <Award size={12} />
           {badge}
-        </Badge>
+        </span>
       ))}
     </div>
   )

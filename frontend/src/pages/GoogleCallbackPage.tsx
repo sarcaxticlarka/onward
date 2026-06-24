@@ -14,11 +14,21 @@ export function GoogleCallbackPage() {
     if (access && refresh) {
       // Decode user from JWT payload
       try {
-        const payload = JSON.parse(atob(access.split('.')[1]))
-        useAuthStore.getState().setUser({ id: payload.sub, email: payload.email })
+        // JWT uses base64url (no padding, - and _); atob needs standard base64 (+ and / with = padding)
+        const raw = access.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+        const b64 = raw + '='.repeat((4 - raw.length % 4) % 4)
+        const payload = JSON.parse(atob(b64))
+        useAuthStore.getState().setUser({
+          id: payload.sub,
+          email: payload.email,
+          preferences: {},
+          timezone: 'UTC',
+          created_at: '',
+        })
         setTokens(access, refresh)
         navigate('/dashboard', { replace: true })
-      } catch {
+      } catch (err) {
+        console.error('Google callback parse error:', err)
         navigate('/login?error=google_failed', { replace: true })
       }
     } else {

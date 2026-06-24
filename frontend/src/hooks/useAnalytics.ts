@@ -16,8 +16,9 @@ export function useCompletionRate(range: 'day' | 'week' | 'month' = 'week') {
   return useQuery({
     queryKey: ['analytics', 'completion-rate', range],
     queryFn: async () => {
-      const { data } = await api.get('/analytics/completion-rate', { params: { range } })
-      return data
+      const { data } = await api.get('/analytics/completion-rate', { params: { granularity: range, days: 30 } })
+      // Backend returns {granularity, data: [...]}
+      return Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []
     },
   })
 }
@@ -27,7 +28,8 @@ export function useFocusHeatmap() {
     queryKey: ['analytics', 'focus-heatmap'],
     queryFn: async () => {
       const { data } = await api.get('/analytics/focus-heatmap')
-      return data
+      // Backend returns {data: [...]}
+      return Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []
     },
   })
 }
@@ -46,8 +48,9 @@ export function useLeaderboard() {
   return useQuery({
     queryKey: ['gamification', 'leaderboard'],
     queryFn: async () => {
-      const { data } = await api.get<LeaderboardEntry[]>('/gamification/leaderboard')
-      return data
+      const { data } = await api.get('/gamification/leaderboard')
+      // Backend wraps in {entries: [...]}
+      return (Array.isArray(data?.entries) ? data.entries : Array.isArray(data) ? data : []) as LeaderboardEntry[]
     },
   })
 }

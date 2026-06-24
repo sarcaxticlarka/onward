@@ -1,5 +1,5 @@
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'overdue'
-export type TaskPriority = 'low' | 'medium' | 'high'
+export type TaskPriority = 'low' | 'medium' | 'high' | 'critical'
 
 export interface Task {
   id: string
@@ -69,7 +69,7 @@ export interface ConflictItem {
 export interface GamificationProfile {
   xp: number
   level: 'Procrastinator' | 'Planner' | 'Achiever' | 'Legend'
-  streak: number
+  streak_days: number
   badges: string[]
 }
 

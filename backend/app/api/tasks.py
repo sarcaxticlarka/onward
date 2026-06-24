@@ -51,14 +51,16 @@ async def create_task(
     db: Database = Depends(get_db),
 ):
     parsed = await task_parser.parse_natural_language_task(payload.raw_input)
-    weight = task_parser.PRIORITY_WEIGHTS.get(parsed.get("priority", "medium"), 0.5)
+    # Use user-selected priority if provided, else fall back to AI-parsed
+    final_priority = (payload.priority.value if payload.priority else None) or parsed.get("priority", "medium")
+    weight = task_parser.PRIORITY_WEIGHTS.get(final_priority, 0.5)
     score = task_parser.compute_priority_score(parsed.get("deadline"), user_weight=weight, ai_confidence=0.6)
     row = db.insert("tasks", {
         "user_id": user.id,
         "title": parsed.get("title", payload.raw_input[:200]),
         "description": None,
         "deadline": parsed.get("deadline"),
-        "priority": parsed.get("priority", "medium"),
+        "priority": final_priority,
         "category": parsed.get("category"),
         "status": "pending",
         "parent_task_id": None,

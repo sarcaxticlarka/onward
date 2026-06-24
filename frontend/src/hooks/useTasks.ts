@@ -21,13 +21,18 @@ export function useTasksQuery(params: TaskListParams = {}) {
   })
 }
 
+interface CreateTaskPayload {
+  raw_input: string
+  priority?: TaskPriority
+}
+
 export function useCreateTask() {
   const queryClient = useQueryClient()
   const addTask = useTaskStore((state) => state.addTask)
 
   return useMutation({
-    mutationFn: async (raw_input: string) => {
-      const { data } = await api.post<Task>('/tasks', { raw_input })
+    mutationFn: async (payload: CreateTaskPayload) => {
+      const { data } = await api.post<Task>('/tasks', payload)
       return data
     },
     onSuccess: (task) => {

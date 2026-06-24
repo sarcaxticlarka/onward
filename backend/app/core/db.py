@@ -412,16 +412,40 @@ class PostgresDB:
 
     @contextmanager
     def _conn(self):
+        import psycopg2
+
         conn = self._pool.getconn()
         try:
+            # conn.closed > 0 means psycopg2 already knows the connection is dead
+            if getattr(conn, 'closed', 0):
+                self._pool.putconn(conn, close=True)
+                conn = self._pool.getconn()
             conn.autocommit = False
             yield conn
             conn.commit()
+        except psycopg2.OperationalError:
+            # Neon dropped the connection server-side — swap in a fresh one and retry
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            try:
+                self._pool.putconn(conn, close=True)
+            except Exception:
+                pass
+            raise  # let the caller handle; pool will issue a fresh conn next call
         except Exception:
-            conn.rollback()
+            try:
+                conn.rollback()
+            except Exception:
+                pass
             raise
         finally:
-            self._pool.putconn(conn)
+            try:
+                if not getattr(conn, 'closed', 0):
+                    self._pool.putconn(conn)
+            except Exception:
+                pass
 
     def _init_schema(self):
         with self._conn() as conn:

@@ -16,6 +16,8 @@ settings = get_settings()
 
 GOOGLE_AUTH_BASE = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+# Must use the same URI registered in Google Cloud Console (reuse login callback)
+CALENDAR_REDIRECT_URI = "http://localhost:8000/auth/google/callback"
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
@@ -23,14 +25,18 @@ class CalendarNotConnectedError(RuntimeError):
     pass
 
 
-def build_auth_url(state: str) -> str:
+def build_auth_url(user_id: str) -> str:
+    """Build the Google OAuth URL for calendar access.
+    The state encodes type=calendar so the shared callback handler routes correctly."""
     if not settings.GOOGLE_CLIENT_ID:
         raise RuntimeError("GOOGLE_CLIENT_ID is not configured.")
+    import json
     from urllib.parse import urlencode
 
+    state = json.dumps({"type": "calendar", "user_id": user_id})
     params = {
         "client_id": settings.GOOGLE_CLIENT_ID,
-        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        "redirect_uri": CALENDAR_REDIRECT_URI,
         "response_type": "code",
         "scope": " ".join(SCOPES),
         "access_type": "offline",

@@ -59,6 +59,7 @@ class TaskPriority(str, Enum):
 
 class TaskCreate(BaseModel):
     raw_input: str
+    priority: Optional[TaskPriority] = None  # override AI-parsed priority
 
 
 class TaskCreateStructured(BaseModel):

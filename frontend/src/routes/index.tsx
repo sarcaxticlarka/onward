@@ -9,6 +9,7 @@ import { AgentPage } from '../pages/AgentPage'
 import { AnalyticsPage } from '../pages/AnalyticsPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { GoogleCallbackPage } from '../pages/GoogleCallbackPage'
+import { CalendarConnectedPage } from '../pages/CalendarConnectedPage'
 import LandingPage from '../pages/LandingPage'
 
 export const router = createBrowserRouter([
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   { path: '/auth/google/success', element: <GoogleCallbackPage /> },
+  { path: '/calendar/connected', element: <CalendarConnectedPage /> },
   {
     element: <ProtectedRoute />,
     children: [

@@ -1,6 +1,6 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { Camera, LogOut, Mail, Menu, Play, SquareUser, X } from 'lucide-react'
+import { Camera, LayoutDashboard, LogOut, Mail, Menu, Play, SquareUser, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAuthStore } from '../../stores/authStore'
 import { useLogout } from '../../hooks/useAuth'
@@ -48,7 +48,9 @@ export function PortfolioSidebar({
   footerLabel = '©2026 Onward.',
 }: PortfolioSidebarProps) {
   const user = useAuthStore(s => s.user)
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated)
   const logout = useLogout()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [openItem, setOpenItem] = useState(items[0]?.to ?? '')
   const hasHashItems = items.some(i => i.to.includes('#'))
@@ -174,13 +176,38 @@ export function PortfolioSidebar({
       </nav>
 
       <div className="sidebar-bottom">
-        <p>turn deadline pressure into a clear plan</p>
-        <Link to={ctaTo} className="black-button" onClick={() => setMenuOpen(false)}>{ctaLabel}</Link>
-        {user && (
-          <button className="sidebar-logout" onClick={() => logout.mutate()}>
-            <LogOut size={14} />
-            sign out
-          </button>
+        {isAuthenticated && user ? (
+          <>
+            <div className="sidebar-profile">
+              <div className="sidebar-avatar">
+                {(user.email?.[0] ?? 'U').toUpperCase()}
+              </div>
+              <div className="sidebar-profile-info">
+                <strong>{user.email?.split('@')[0] ?? 'user'}</strong>
+                <span>{user.email}</span>
+              </div>
+            </div>
+            <button
+              className="black-button"
+              onClick={() => { setMenuOpen(false); navigate('/dashboard') }}
+            >
+              <LayoutDashboard size={16} />
+              dashboard
+            </button>
+            <button
+              className="sidebar-logout"
+              onClick={() => logout.mutate()}
+              disabled={logout.isPending}
+            >
+              <LogOut size={14} />
+              {logout.isPending ? 'signing out...' : 'sign out'}
+            </button>
+          </>
+        ) : (
+          <>
+            <p>turn deadline pressure into a clear plan</p>
+            <Link to={ctaTo} className="black-button" onClick={() => setMenuOpen(false)}>{ctaLabel}</Link>
+          </>
         )}
         <div className="sidebar-footer">
           <span>{footerLabel}</span>

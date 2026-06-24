@@ -1,25 +1,17 @@
 import { useAnalyticsSummary } from '../../hooks/useAnalytics'
-import { Skeleton } from '../ui/Skeleton'
 
 export function WeeklySummaryCard() {
   const { data, isLoading, isError } = useAnalyticsSummary()
 
   return (
-    <div className="rounded-xl border border-border p-4">
-      <h3 className="mb-2 text-sm font-medium text-text-h">AI Weekly Summary</h3>
-      {isLoading && <Skeleton className="h-16 w-full" />}
-      {isError && <p className="text-sm text-danger">Could not load summary.</p>}
+    <div style={{ borderRadius: 16, border: '1.5px solid var(--border)', padding: 20 }}>
+      <p className="section-label" style={{ marginBottom: 10 }}>AI weekly summary</p>
+      {isLoading && <div className="skeleton" style={{ height: 60, borderRadius: 8 }} />}
+      {isError && <p style={{ color: 'var(--danger)', fontSize: 13 }}>Could not load summary.</p>}
       {data && (
-        <div className="flex flex-col gap-2 text-sm text-text">
-          <p>{data.summary_text}</p>
-          {data.recommendations.length > 0 && (
-            <ul className="list-disc pl-4">
-              {data.recommendations.map((rec) => (
-                <li key={rec}>{rec}</li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <p style={{ color: 'var(--gray)', fontSize: 15, lineHeight: 1.6 }}>
+          {(data as any).summary || (data as any).summary_text || 'No summary available yet.'}
+        </p>
       )}
     </div>
   )

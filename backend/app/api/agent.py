@@ -101,8 +101,9 @@ async def agent_ws(websocket: WebSocket):
         while True:
             msg = await websocket.receive_json()
             user_message = msg.get("message", "")
+            await websocket.send_json({"event": "status", "data": "Reading your tasks..."})
             tasks, calendar_context = await _gather_context(db, user_id)
-            await websocket.send_json({"event": "status", "data": "Reading your tasks and calendar..."})
+            await websocket.send_json({"event": "status", "data": "Thinking..."})
             result = await run_agent(db=db, user_id=user_id, user_message=user_message, task_list=tasks, calendar_context=calendar_context)
             for action in result.get("actions_taken", []):
                 await websocket.send_json({"event": "tool", "data": json.loads(json.dumps(action, default=str))})

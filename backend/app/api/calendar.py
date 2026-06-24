@@ -21,13 +21,23 @@ from app.services import calendar_service
 router = APIRouter(prefix="/calendar", tags=["calendar"])
 
 
+@router.get("/status")
+async def calendar_status(
+    user: CurrentUser = Depends(get_current_user),
+    db: Database = Depends(get_db),
+):
+    """Returns whether the user has connected Google Calendar."""
+    rows = [i for i in db.list("integrations", {"user_id": user.id}) if i.get("provider") == "google_calendar"]
+    connected = bool(rows and rows[0].get("access_token"))
+    return {"connected": connected}
+
+
 @router.get("/auth")
 async def calendar_auth(user: CurrentUser = Depends(get_current_user)):
     """Start the Google OAuth2 flow for calendar access. Returns the consent URL
     (state encodes the authenticated user id so the callback can attribute tokens)."""
-    state = user.id
     try:
-        url = calendar_service.build_auth_url(state)
+        url = calendar_service.build_auth_url(user.id)
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     return {"auth_url": url}

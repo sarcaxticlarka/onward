@@ -21,7 +21,7 @@ export function XPBar() {
           <div style={{ fontWeight: 800, fontSize: 15 }}>{data.level}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--gray)' }}>
             <Flame size={12} color="var(--sidebar)" />
-            {data.streak} day streak
+            {data.streak_days ?? 0} day streak
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>

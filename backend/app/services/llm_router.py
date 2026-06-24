@@ -34,8 +34,12 @@ class TaskType(str, Enum):
     CHAT = "chat"
 
 
-_GROQ_TASKS = {TaskType.FAST, TaskType.DEADLINE_PARSE, TaskType.CLASSIFICATION}
-_CLAUDE_TASKS = {TaskType.REASONING, TaskType.DECOMPOSITION, TaskType.PLANNING, TaskType.CHAT}
+# Route everything to Groq — it's the only key configured and it's the fastest
+_GROQ_TASKS = {
+    TaskType.FAST, TaskType.DEADLINE_PARSE, TaskType.CLASSIFICATION,
+    TaskType.REASONING, TaskType.DECOMPOSITION, TaskType.PLANNING, TaskType.CHAT,
+}
+_CLAUDE_TASKS: set = set()
 _OPENAI_TASKS = {TaskType.VISION, TaskType.VOICE}
 
 

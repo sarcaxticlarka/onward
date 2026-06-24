@@ -28,6 +28,7 @@ GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_LOGIN_REDIRECT = "http://localhost:8000/auth/google/callback"
+FRONTEND_BASE = "http://localhost:5173"
 
 
 @router.get("/google")
@@ -47,13 +48,27 @@ async def google_login():
 
 
 @router.get("/google/callback")
-async def google_callback(code: str, db: Database = Depends(get_db)):
-    """Exchange Google code for user info, create/find user, issue JWT."""
+async def google_callback(code: str, state: str = "", db: Database = Depends(get_db)):
+    """Exchange Google code for user info or calendar tokens, depending on `state`.
+
+    Login flow:  state is empty / not JSON  → issue JWT, redirect to frontend
+    Calendar flow: state is JSON {"type":"calendar","user_id":"..."}
+                   → store calendar OAuth tokens, redirect to frontend /calendar/connected
+    """
     if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
         raise HTTPException(status_code=501, detail="Google OAuth not configured")
 
+    # Detect calendar connection flow
+    import json as _json
+    _calendar_user_id: str | None = None
+    try:
+        _state_data = _json.loads(state) if state.startswith("{") else {}
+        if _state_data.get("type") == "calendar":
+            _calendar_user_id = _state_data.get("user_id")
+    except Exception:
+        pass
+
     async with httpx.AsyncClient() as client:
-        # Exchange code for tokens
         token_resp = await client.post(GOOGLE_TOKEN_URL, data={
             "code": code,
             "client_id": settings.GOOGLE_CLIENT_ID,
@@ -65,7 +80,14 @@ async def google_callback(code: str, db: Database = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Failed to exchange Google code")
         token_data = token_resp.json()
 
-        # Fetch user info
+    # ── Calendar flow ──────────────────────────────────────────────────────────
+    if _calendar_user_id:
+        from app.services import calendar_service
+        calendar_service.store_tokens(db, user_id=_calendar_user_id, token_data=token_data)
+        return RedirectResponse(f"{FRONTEND_BASE}/calendar/connected", status_code=302)
+
+    # ── Login flow ─────────────────────────────────────────────────────────────
+    async with httpx.AsyncClient() as client:
         user_resp = await client.get(GOOGLE_USERINFO_URL, headers={
             "Authorization": f"Bearer {token_data['access_token']}"
         })
@@ -77,7 +99,6 @@ async def google_callback(code: str, db: Database = Depends(get_db)):
     if not email:
         raise HTTPException(status_code=400, detail="No email from Google")
 
-    # Find or create user
     rows = db.list("users", {"email": email})
     if rows:
         user = rows[0]
@@ -86,10 +107,13 @@ async def google_callback(code: str, db: Database = Depends(get_db)):
         user = db.insert("users", {
             "id": user_id,
             "email": email,
-            "password_hash": "",  # no password for Google users
-            "display_name": guser.get("name", email.split("@")[0]),
+            "password_hash": "",
             "timezone": "UTC",
-            "preferences": {"google_id": guser.get("id"), "avatar": guser.get("picture")},
+            "preferences": {
+                "google_id": guser.get("id"),
+                "avatar": guser.get("picture"),
+                "display_name": guser.get("name", email.split("@")[0]),
+            },
             "created_at": utcnow_iso(),
         })
 
@@ -97,9 +121,8 @@ async def google_callback(code: str, db: Database = Depends(get_db)):
     refresh = create_refresh_token(user["id"])
     db.insert("refresh_tokens", {"token": refresh, "user_id": user["id"], "created_at": utcnow_iso(), "revoked": False})
 
-    # Redirect to frontend with tokens in URL fragment
-    frontend = f"http://localhost:5173/auth/google/success#access={access}&refresh={refresh}"
-    return RedirectResponse(frontend)
+    frontend = f"{FRONTEND_BASE}/auth/google/success#access={access}&refresh={refresh}"
+    return RedirectResponse(frontend, status_code=302)
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)

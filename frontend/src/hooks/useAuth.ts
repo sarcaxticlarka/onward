@@ -50,10 +50,13 @@ export function useRegister() {
 
 export function useLogout() {
   const logout = useAuthStore((state) => state.logout)
+  const refreshToken = useAuthStore((state) => state.refreshToken)
 
   return useMutation({
     mutationFn: async () => {
-      await api.post('/auth/logout')
+      if (refreshToken) {
+        await api.post('/auth/logout', { refresh_token: refreshToken }).catch(() => {})
+      }
     },
     onSettled: () => {
       logout()
