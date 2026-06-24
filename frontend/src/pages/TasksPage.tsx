@@ -17,7 +17,7 @@ export function TasksPage() {
   return (
     <div>
       <div className="top-status">
-        <span className="availability">Onward task parser ready</span>
+        <span className="availability">LMLS task parser ready</span>
         <span><span className="mini-tag">capture</span> → <span className="mini-tag">decompose</span></span>
       </div>
 

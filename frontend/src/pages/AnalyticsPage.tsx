@@ -9,7 +9,7 @@ export function AnalyticsPage() {
   return (
     <div>
       <div className="top-status">
-        <span className="availability">Onward focus patterns updating</span>
+        <span className="availability">LMLS focus patterns updating</span>
         <span><span className="mini-tag">2015</span> - <span className="mini-tag">2026</span></span>
       </div>
 

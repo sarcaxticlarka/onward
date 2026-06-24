@@ -8,12 +8,14 @@ import { TasksPage } from '../pages/TasksPage'
 import { AgentPage } from '../pages/AgentPage'
 import { AnalyticsPage } from '../pages/AnalyticsPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
+import { GoogleCallbackPage } from '../pages/GoogleCallbackPage'
 import LandingPage from '../pages/LandingPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
+  { path: '/auth/google/success', element: <GoogleCallbackPage /> },
   {
     element: <ProtectedRoute />,
     children: [

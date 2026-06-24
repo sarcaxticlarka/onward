@@ -8,7 +8,7 @@ const NAV = [
     num: '01',
     details: (
       <>
-        <span>today's Onward command</span>
+        <span>today's LMLS command</span>
         <span><Bot size={18} /> live agent</span>
       </>
     ),
@@ -32,9 +32,9 @@ export function Sidebar() {
   return (
     <PortfolioSidebar
       items={NAV}
-      ctaLabel="ask Onward"
+      ctaLabel="ask agent"
       ctaTo="/agent"
-      footerLabel="©2026 Onward."
+      footerLabel="©2026 LMLS."
     />
   )
 }

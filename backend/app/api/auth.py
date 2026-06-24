@@ -1,14 +1,12 @@
-"""Auth endpoints: register, login, refresh, logout.
-
-Primary path uses Supabase Auth (when SUPABASE_URL/KEY are configured).
-Fallback path issues locally-signed JWTs against the users/refresh_tokens
-tables in SQLite, so auth works fully without external credentials.
-"""
+"""Auth endpoints: register, login, refresh, logout, Google OAuth."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 
 from app.core.config import get_settings
 from app.core.db import Database, get_db, new_id, utcnow_iso
@@ -25,6 +23,83 @@ from app.models.schemas import LoginRequest, LogoutRequest, RefreshRequest, Regi
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 settings = get_settings()
+
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
+GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+GOOGLE_LOGIN_REDIRECT = "http://localhost:8000/auth/google/callback"
+
+
+@router.get("/google")
+async def google_login():
+    """Redirect to Google OAuth consent screen for Sign-In."""
+    if not settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=501, detail="Google OAuth not configured")
+    params = {
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": GOOGLE_LOGIN_REDIRECT,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "access_type": "offline",
+        "prompt": "select_account",
+    }
+    return RedirectResponse(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")
+
+
+@router.get("/google/callback")
+async def google_callback(code: str, db: Database = Depends(get_db)):
+    """Exchange Google code for user info, create/find user, issue JWT."""
+    if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+        raise HTTPException(status_code=501, detail="Google OAuth not configured")
+
+    async with httpx.AsyncClient() as client:
+        # Exchange code for tokens
+        token_resp = await client.post(GOOGLE_TOKEN_URL, data={
+            "code": code,
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uri": GOOGLE_LOGIN_REDIRECT,
+            "grant_type": "authorization_code",
+        })
+        if token_resp.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to exchange Google code")
+        token_data = token_resp.json()
+
+        # Fetch user info
+        user_resp = await client.get(GOOGLE_USERINFO_URL, headers={
+            "Authorization": f"Bearer {token_data['access_token']}"
+        })
+        if user_resp.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to fetch Google user info")
+        guser = user_resp.json()
+
+    email = guser.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="No email from Google")
+
+    # Find or create user
+    rows = db.list("users", {"email": email})
+    if rows:
+        user = rows[0]
+    else:
+        user_id = new_id()
+        user = db.insert("users", {
+            "id": user_id,
+            "email": email,
+            "password_hash": "",  # no password for Google users
+            "display_name": guser.get("name", email.split("@")[0]),
+            "timezone": "UTC",
+            "preferences": {"google_id": guser.get("id"), "avatar": guser.get("picture")},
+            "created_at": utcnow_iso(),
+        })
+
+    access = create_access_token(user["id"], user["email"])
+    refresh = create_refresh_token(user["id"])
+    db.insert("refresh_tokens", {"token": refresh, "user_id": user["id"], "created_at": utcnow_iso(), "revoked": False})
+
+    # Redirect to frontend with tokens in URL fragment
+    frontend = f"http://localhost:5173/auth/google/success#access={access}&refresh={refresh}"
+    return RedirectResponse(frontend)
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
