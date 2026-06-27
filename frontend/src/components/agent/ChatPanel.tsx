@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, Bot, Loader2, Mic, Send, Zap } from 'lucide-react'
+import { Bot, Loader2, Send, Zap } from 'lucide-react'
 import { useAgentStore } from '../../stores/agentStore'
 import { useAgentChat } from '../../hooks/useAgentChat'
 import { VoiceInputButton } from './VoiceInputButton'

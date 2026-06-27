@@ -1,13 +1,17 @@
 import { useState } from 'react'
-import { ArrowRight, Plus } from 'lucide-react'
+import { ArrowRight, Mic, Plus, Sparkles } from 'lucide-react'
 import { TaskList } from '../components/tasks/TaskList'
 import { AddTaskModal } from '../components/tasks/AddTaskModal'
+import { VoiceTaskInput } from '../components/tasks/VoiceTaskInput'
+import { TemplateModal } from '../components/tasks/TemplateModal'
 import { useTaskStore } from '../stores/taskStore'
 import { useTasksQuery } from '../hooks/useTasks'
 import { IconStack } from '../components/brand/BrandMarks'
 
 export function TasksPage() {
-  const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpen, setModalOpen]       = useState(false)
+  const [voiceOpen, setVoiceOpen]       = useState(false)
+  const [templateOpen, setTemplateOpen] = useState(false)
   useTasksQuery()
   const tasks = useTaskStore(s => s.tasks)
   const total     = tasks.length
@@ -26,13 +30,27 @@ export function TasksPage() {
           <h1 className="headline" style={{ fontSize: 'clamp(56px, 7vw, 112px)' }}>tasks</h1>
           <div>
             <IconStack />
-            <button
-              onClick={() => setModalOpen(true)}
-              className="black-button"
-              style={{ minHeight: 58 }}
-            >
-              add task <Plus size={18} />
-            </button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setVoiceOpen(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 20px', minHeight: 58, borderRadius: 14, border: 'none', background: 'var(--yellow)', color: 'var(--sidebar)', fontWeight: 900, fontSize: 15, cursor: 'pointer' }}
+              >
+                <Mic size={18} /> voice
+              </button>
+              <button
+                onClick={() => setTemplateOpen(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 20px', minHeight: 58, borderRadius: 14, border: '2px solid var(--sidebar)', background: 'var(--cream-dark)', color: 'var(--sidebar)', fontWeight: 900, fontSize: 15, cursor: 'pointer' }}
+              >
+                <Sparkles size={18} /> templates
+              </button>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="black-button"
+                style={{ minHeight: 58 }}
+              >
+                add task <Plus size={18} />
+              </button>
+            </div>
           </div>
           <h1 className="headline" style={{ fontSize: 'clamp(56px, 7vw, 112px)' }}>planned</h1>
         </div>
@@ -71,6 +89,8 @@ export function TasksPage() {
       </div>
       <TaskList />
       <AddTaskModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {voiceOpen    && <VoiceTaskInput  onClose={() => setVoiceOpen(false)} />}
+      {templateOpen && <TemplateModal   onClose={() => setTemplateOpen(false)} />}
     </div>
   )
 }

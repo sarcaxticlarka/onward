@@ -41,7 +41,7 @@ export function CompletionChart() {
                 <YAxis tick={{ fontSize: 11, fill: 'var(--gray)' }} tickFormatter={v => `${v}%`} />
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: '1.5px solid var(--border)', fontSize: 12 }}
-                  formatter={(v: number) => [`${v}%`, 'Completion']}
+                  formatter={(v) => [`${v}%`, 'Completion']}
                 />
                 <Line type="monotone" dataKey="rate" stroke="var(--sidebar)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--sidebar)' }} activeDot={{ r: 6 }} />
               </LineChart>

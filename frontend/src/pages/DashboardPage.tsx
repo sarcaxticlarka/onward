@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Bot, CalendarCheck, CheckSquare, Flame, Plus, Sparkles, BarChart2, ChevronRight, CreditCard, Star } from 'lucide-react'
+import { ArrowRight, Bot, CalendarCheck, CheckSquare, Flame, Mic, Plus, Sparkles, BarChart2, ChevronRight, CreditCard, Star, AlertTriangle } from 'lucide-react'
+import { VoiceTaskInput } from '../components/tasks/VoiceTaskInput'
 import { useTaskStore } from '../stores/taskStore'
 import { useTasksQuery } from '../hooks/useTasks'
 import { useAuthStore } from '../stores/authStore'
@@ -11,6 +12,7 @@ import { AddTaskModal } from '../components/tasks/AddTaskModal'
 import { CalendarPanel } from '../components/calendar/CalendarPanel'
 import { PaymentModal } from '../components/payment/PaymentModal'
 import { useBillingStatus } from '../hooks/useCalendar'
+import { DeadlineRiskPanel } from '../components/analytics/DeadlineRiskPanel'
 
 const STEPS = [
   {
@@ -142,8 +144,9 @@ function HowItWorksBar() {
 }
 
 export function DashboardPage() {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [payModal, setPayModal]   = useState<{ plan: string; price: string } | null>(null)
+  const [modalOpen, setModalOpen]   = useState(false)
+  const [voiceOpen, setVoiceOpen]   = useState(false)
+  const [payModal, setPayModal]     = useState<{ plan: string; price: string } | null>(null)
   const { isLoading } = useTasksQuery()
   const { data: billing } = useBillingStatus()
   const tasks = useTaskStore(s => s.tasks ?? [])
@@ -182,6 +185,24 @@ export function DashboardPage() {
       </div>
 
       <CrisisBanner />
+      {/* Auto-detect crisis and show banner */}
+      {overdue >= 3 && (
+        <Link to="/crisis" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          borderRadius: 14, background: '#dc2626', padding: '14px 20px',
+          textDecoration: 'none', marginBottom: 20,
+          animation: 'pulse 1.5s ease-in-out infinite',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <AlertTriangle size={20} color="#fff" />
+            <div>
+              <div style={{ fontWeight: 900, fontSize: 15, color: '#fff' }}>Crisis Mode — {overdue} overdue tasks!</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>Click to open your AI survival plan</div>
+            </div>
+          </div>
+          <ArrowRight size={18} color="#fff" />
+        </Link>
+      )}
 
       {/* New user: full onboarding */}
       {isNewUser && <EmptyOnboarding onAddTask={() => setModalOpen(true)} />}
@@ -222,6 +243,9 @@ export function DashboardPage() {
                   <h2 style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-0.02em' }}>Your top tasks</h2>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => setVoiceOpen(true)} title="Add task by voice" style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 13px', borderRadius: 20, fontSize: 13, fontWeight: 700, background: 'var(--sidebar)', color: 'var(--yellow)', border: '1.5px solid var(--sidebar)', cursor: 'pointer' }}>
+                    <Mic size={13} /> voice
+                  </button>
                   <button onClick={() => setModalOpen(true)} className="pill pill-black" style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Plus size={13} /> add task
                   </button>
@@ -256,6 +280,9 @@ export function DashboardPage() {
 
             {/* Sidebar */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Deadline Risk */}
+              <DeadlineRiskPanel />
+
               {/* XP */}
               <div style={{ borderRadius: 16, border: '1.5px solid var(--border)', padding: '18px 20px', background: 'var(--white)' }}>
                 <p className="section-label" style={{ marginBottom: 12 }}>your progress</p>
@@ -332,6 +359,7 @@ export function DashboardPage() {
       )}
 
       <AddTaskModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {voiceOpen && <VoiceTaskInput onClose={() => setVoiceOpen(false)} />}
       {payModal && (
         <PaymentModal
           plan={payModal.plan}

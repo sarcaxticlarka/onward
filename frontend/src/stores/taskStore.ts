@@ -51,7 +51,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         return ad - bd
       }
       if (filters.sortBy === 'priority') {
-        const order: Record<TaskPriority, number> = { high: 0, medium: 1, low: 2 }
+        const order: Record<TaskPriority, number> = { critical: 0, high: 1, medium: 2, low: 3 }
         return order[a.priority] - order[b.priority]
       }
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()

@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { ChevronRight, ChevronDown, Sparkles, Clock, Check, Play, RotateCcw } from 'lucide-react'
+import { ChevronRight, ChevronDown, Sparkles, Clock, Check, Play, RotateCcw, Timer } from 'lucide-react'
 import type { Task, TaskStatus } from '../../types'
 import { formatDeadline, isUrgent, timeUntil } from '../../lib/utils'
 import { useUpdateTask, useDecomposeTask } from '../../hooks/useTasks'
 import { SubtaskTree } from './SubtaskTree'
 import { toast } from '../ui/Toast'
+import { PomodoroTimer } from '../pomodoro/PomodoroTimer'
 
 const PRIORITY_STYLE: Record<string, { bg: string; color: string; label: string }> = {
   critical: { bg: '#fee2e2', color: '#991b1b', label: 'Critical' },
@@ -40,7 +41,8 @@ const ACTIONS: Record<TaskStatus, Array<{ label: string; icon: React.ReactNode; 
 }
 
 export function TaskCard({ task }: { task: Task }) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded]   = useState(false)
+  const [showPomodoro, setShowPomodoro] = useState(false)
   const updateTask    = useUpdateTask()
   const decomposeTask = useDecomposeTask()
   const urgent = isUrgent(task.deadline)
@@ -110,7 +112,7 @@ export function TaskCard({ task }: { task: Task }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
             <span style={{
-              fontWeight: 700, fontSize: 14, color: 'var(--black)',
+              fontWeight: 700, fontSize: 14,
               textDecoration: isCompleted ? 'line-through' : 'none',
               color: isCompleted ? 'var(--gray)' : 'var(--black)',
             }}>
@@ -166,25 +168,42 @@ export function TaskCard({ task }: { task: Task }) {
               </button>
             ))}
           </div>
-          {/* Decompose button */}
+          {/* Decompose + Pomodoro buttons */}
           {!isCompleted && (
-            <button
-              onClick={() => decomposeTask.mutate(task.id)}
-              disabled={decomposeTask.isPending}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700,
-                cursor: decomposeTask.isPending ? 'not-allowed' : 'pointer',
-                border: '1.5px solid var(--border)', background: 'var(--cream)',
-                color: 'var(--sidebar)', opacity: decomposeTask.isPending ? 0.5 : 1,
-              }}
-            >
-              <Sparkles size={11} />
-              {decomposeTask.isPending ? 'splitting...' : 'decompose'}
-            </button>
+            <div style={{ display: 'flex', gap: 5 }}>
+              <button
+                onClick={() => decomposeTask.mutate(task.id)}
+                disabled={decomposeTask.isPending}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  cursor: decomposeTask.isPending ? 'not-allowed' : 'pointer',
+                  border: '1.5px solid var(--border)', background: 'var(--cream)',
+                  color: 'var(--sidebar)', opacity: decomposeTask.isPending ? 0.5 : 1,
+                }}
+              >
+                <Sparkles size={11} />
+                {decomposeTask.isPending ? 'splitting...' : 'decompose'}
+              </button>
+              <button
+                onClick={() => setShowPomodoro(true)}
+                title="Start 25-min focus session"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  cursor: 'pointer', border: '1.5px solid var(--yellow)',
+                  background: 'var(--sidebar)', color: 'var(--yellow)',
+                }}
+              >
+                <Timer size={11} /> focus
+              </button>
+            </div>
           )}
         </div>
       </div>
+
+      {/* Pomodoro full-screen timer */}
+      {showPomodoro && <PomodoroTimer task={task} onClose={() => setShowPomodoro(false)} />}
 
       {/* Subtasks */}
       {expanded && (

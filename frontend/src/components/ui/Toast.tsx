@@ -44,7 +44,6 @@ function SingleToast({ item, onDone }: { item: ToastItem; onDone: (id: string) =
     <div
       style={{
         display: 'flex', alignItems: 'flex-start', gap: 12,
-        background: '#fff',
         border: `1.5px solid ${border}`,
         borderLeft: `4px solid ${item.type === 'xp' ? '#d97706' : item.type === 'success' ? '#16a34a' : 'var(--sidebar)'}`,
         borderRadius: 14,

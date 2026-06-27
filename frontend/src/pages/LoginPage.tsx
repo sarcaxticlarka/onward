@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { PortfolioSidebar } from '../components/brand/PortfolioSidebar'
 import { IconStack } from '../components/brand/BrandMarks'
 import { useLogin } from '../hooks/useAuth'
+import { useAuthStore } from '../stores/authStore'
 
 const NAV = [
   { to: '/', label: 'home', num: '01' },
@@ -28,11 +29,26 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const googleError = searchParams.get('error')
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated)
   const loginMutation = useLogin()
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 })
-  }, [])
+    // If already authenticated, go to dashboard (stale ?error in URL after re-login)
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true })
+      return
+    }
+    // Clear the error param from URL after 5 seconds so it doesn't linger
+    if (googleError) {
+      const t = setTimeout(() => {
+        setSearchParams({}, { replace: true })
+      }, 5000)
+      return () => clearTimeout(t)
+    }
+  }, [isAuthenticated])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -57,6 +73,11 @@ export function LoginPage() {
           </p>
 
           {/* Google Sign-In */}
+          {googleError && (
+            <div className="letter-note" style={{ margin: '0 0 12px', color: 'var(--danger)', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', fontSize: 14 }}>
+              Google sign-in failed: {googleError.replace(/_/g, ' ')}. Please try again or use email/password.
+            </div>
+          )}
           <a
             href="http://localhost:8000/auth/google"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '14px 24px', borderRadius: 8, border: '2px dashed var(--border)', background: 'var(--white)', fontWeight: 700, fontSize: 16, cursor: 'pointer', textDecoration: 'none', color: 'var(--black)', marginBottom: 4 }}

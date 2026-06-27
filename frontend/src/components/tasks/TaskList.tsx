@@ -1,7 +1,6 @@
 import { useTaskStore } from '../../stores/taskStore'
 import { useTasksQuery } from '../../hooks/useTasks'
 import { TaskCard } from './TaskCard'
-import { Skeleton } from '../ui/Skeleton'
 import type { TaskPriority, TaskStatus } from '../../types'
 
 const statusOptions: Array<TaskStatus | 'all'> = ['all', 'pending', 'in_progress', 'completed', 'overdue']

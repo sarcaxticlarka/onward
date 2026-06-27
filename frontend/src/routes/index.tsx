@@ -11,6 +11,10 @@ import { NotFoundPage } from '../pages/NotFoundPage'
 import { GoogleCallbackPage } from '../pages/GoogleCallbackPage'
 import { CalendarConnectedPage } from '../pages/CalendarConnectedPage'
 import LandingPage from '../pages/LandingPage'
+import { CrisisPage } from '../pages/CrisisPage'
+import { RoomsPage } from '../pages/RoomsPage'
+import { WeeklyReportPage } from '../pages/WeeklyReportPage'
+import { ProfilePage } from '../pages/ProfilePage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
@@ -28,6 +32,10 @@ export const router = createBrowserRouter([
           { path: '/tasks', element: <TasksPage /> },
           { path: '/agent', element: <AgentPage /> },
           { path: '/analytics', element: <AnalyticsPage /> },
+          { path: '/crisis', element: <CrisisPage /> },
+          { path: '/rooms', element: <RoomsPage /> },
+          { path: '/report', element: <WeeklyReportPage /> },
+          { path: '/profile', element: <ProfilePage /> },
         ],
       },
     ],

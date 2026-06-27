@@ -1,3 +1,7 @@
+import { Link } from 'react-router-dom'
+import { FileText } from 'lucide-react'
+import { StreakHeatmap } from '../components/analytics/StreakHeatmap'
+import { DeadlineRiskPanel } from '../components/analytics/DeadlineRiskPanel'
 import { CompletionChart } from '../components/analytics/CompletionChart'
 import { PriorityPieChart } from '../components/analytics/PriorityPieChart'
 import { FocusHeatmap } from '../components/analytics/FocusHeatmap'
@@ -65,22 +69,48 @@ export function AnalyticsPage() {
         </div>
       </div>
 
+      {/* Deadline Predictor — full width */}
+      <div style={{ marginBottom: 20 }}>
+        <DeadlineRiskPanel />
+      </div>
+
       {/* Charts row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 16, marginBottom: 20 }}>
         <CompletionChart />
         <PriorityPieChart />
       </div>
 
-      {/* Heatmap full width */}
+      {/* Streak heatmap — GitHub style, full width */}
+      <div style={{ marginBottom: 20 }}>
+        <StreakHeatmap />
+      </div>
+
+      {/* Focus heatmap full width */}
       <div style={{ marginBottom: 20 }}>
         <FocusHeatmap />
       </div>
 
       {/* Summary + Leaderboard */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 16, marginBottom: 20 }}>
         <WeeklySummaryCard />
         <Leaderboard />
       </div>
+
+      {/* Weekly Report CTA */}
+      <Link to="/report" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: 16, border: '1.5px solid var(--sidebar)', background: 'var(--sidebar)', padding: '20px 28px', textDecoration: 'none', color: '#fff' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FileText size={22} color="var(--yellow)" />
+          </div>
+          <div>
+            <div style={{ fontWeight: 900, fontSize: 17, marginBottom: 3 }}>Weekly AI Report Card</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>AI narrative · daily bar chart · badge recap · next-week suggestions</div>
+          </div>
+        </div>
+        <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--yellow)', display: 'flex', alignItems: 'center', gap: 6 }}>
+          view report →
+        </div>
+      </Link>
     </div>
   )
 }

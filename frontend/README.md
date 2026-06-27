@@ -1,32 +1,36 @@
-# React + TypeScript + Vite
+# LMLS — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 18 + TypeScript + Vite frontend for Last-Minute Life Saver.
 
-Currently, two official plugins are available:
+## Quick start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+cp .env.example .env   # set VITE_API_URL=http://localhost:8000
+npm run dev            # → http://localhost:5173
+npm run build          # production build → dist/
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Key pages
+
+| Route | Component | Description |
+|---|---|---|
+| `/` | LandingPage | Marketing landing |
+| `/login` | LoginPage | Email/pw + Google OAuth |
+| `/register` | RegisterPage | New account |
+| `/dashboard` | DashboardPage | Overview + agent quick-chat |
+| `/tasks` | TasksPage | Full task manager (voice, templates, CRUD) |
+| `/agent` | AgentPage | Full LangGraph agent chat panel |
+| `/analytics` | AnalyticsPage | Charts, heatmap, streak, risk |
+| `/crisis` | CrisisPage | Crisis mode + battle plan |
+| `/rooms` | RoomsPage | Peer accountability rooms |
+| `/report` | WeeklyReportPage | AI weekly report card |
+| `/profile` | ProfilePage | Account info, sign out |
+
+## Environment
+
+```
+VITE_API_URL=http://localhost:8000
+```
+
+See the root `README.md` for full project documentation.

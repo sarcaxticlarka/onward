@@ -80,19 +80,19 @@ const SERVICES = [
   { title: 'voice capture', tags: ['speak tasks', 'hands-free input'], Icon: Mic },
 ]
 
-const TECH_STACK = [
-  ['langgraph agent', 'stateful react agent loop — plan, act, observe', '2026'],
-  ['groq llm router', 'fast classification + reasoning paths', '2026'],
-  ['neon postgres', 'serverless postgres for tasks + events', '2026'],
-  ['google calendar api', 'live conflict detection + scheduling', '2026'],
-  ['recharts analytics', 'focus time, velocity, streak tracking', '2025'],
+const PROOF_POINTS = [
+  ['tasks broken down instantly', 'one sentence. full subtask plan.', '01'],
+  ['deadlines you actually hit', 'highest-risk task always surfaces first.', '02'],
+  ['calendar conflicts gone', 'Google Calendar sync flags clashes before they hit.', '03'],
+  ['crisis mode', 'hour-by-hour recovery when it all piles up.', '04'],
+  ['see your progress', 'heatmap, streak, weekly AI report card.', '05'],
 ]
 
 const OUTCOMES = [
-  ['riya sharma', 'final year student', 'it broke my thesis into actual daily blocks. first time in weeks i knew what to do when i opened my laptop.', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80'],
-  ['arjun mehta', 'hackathon lead', 'crisis mode hit when we had 6 tasks and 4 hours. the agent ordered them, flagged the blocker, and we shipped.', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80'],
+  ['riya sharma', 'final year student', 'it broke my thesis into actual daily blocks. first time in weeks i knew what to do when i opened my laptop.', 'https://images.unsplash.com/photo-1762341104634-998bbee0ccba?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'],
+  ['arjun mehta', 'hackathon lead', 'crisis mode hit when we had 6 tasks and 4 hours. the agent ordered them, flagged the blocker, and we shipped.', 'https://images.unsplash.com/photo-1619457164717-b11dd65f7ef2?q=80&w=974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'],
   ['priya iyer', 'product manager', 'calendar sync finally showed me why i kept missing prep time. conflict detection changed how i plan sprints.', 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&auto=format&fit=crop&q=80'],
-  ['karan thakur', 'freelance developer', 'one place for tasks, calendar pressure, agent chat, and progress charts. everything else felt like a to-do list.', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80'],
+  ['karan thakur', 'freelance developer', 'one place for tasks, calendar pressure, agent chat, and progress charts. everything else felt like a to-do list.', 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?q=80&w=989&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'],
 ]
 
 const HOW_STEPS = [
@@ -318,7 +318,7 @@ export default function LandingPage() {
             <span><span className="mini-tag">2025</span> - <span className="mini-tag">2026</span></span>
           </div>
           <div className="project-list">
-            {TECH_STACK.map(([name, desc, year]) => (
+            {PROOF_POINTS.map(([name, desc, year]) => (
               <div className="project-row" key={name}>
                 <strong>{name}</strong>
                 <span>{desc}</span>
@@ -327,7 +327,11 @@ export default function LandingPage() {
             ))}
           </div>
           <div className="logo-strip">
-            <span>LangGraph</span><span>Groq</span><span>FastAPI</span><span>React 18</span><span>Neon DB</span><span>Recharts</span>
+            <span>stop guessing priorities</span>
+            <span>stop missing deadlines</span>
+            <span>stop context-switching</span>
+            <span>stop the sunday panic</span>
+            <span>start shipping on time</span>
           </div>
         </section>
 

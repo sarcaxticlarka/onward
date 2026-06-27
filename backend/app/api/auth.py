@@ -76,9 +76,12 @@ async def google_callback(code: str, state: str = "", db: Database = Depends(get
             "redirect_uri": GOOGLE_LOGIN_REDIRECT,
             "grant_type": "authorization_code",
         })
-        if token_resp.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to exchange Google code")
         token_data = token_resp.json()
+
+    # Google returns 200 even for errors — check for error field or missing token
+    if token_resp.status_code != 200 or token_data.get("error") or not token_data.get("access_token"):
+        err = token_data.get("error_description") or token_data.get("error") or "token_exchange_failed"
+        return RedirectResponse(f"{FRONTEND_BASE}/login?error={err}", status_code=302)
 
     # ── Calendar flow ──────────────────────────────────────────────────────────
     if _calendar_user_id:
@@ -92,7 +95,7 @@ async def google_callback(code: str, state: str = "", db: Database = Depends(get
             "Authorization": f"Bearer {token_data['access_token']}"
         })
         if user_resp.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to fetch Google user info")
+            return RedirectResponse(f"{FRONTEND_BASE}/login?error=google_userinfo_failed", status_code=302)
         guser = user_resp.json()
 
     email = guser.get("email")

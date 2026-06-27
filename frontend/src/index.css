@@ -596,7 +596,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 .hero-title {
-  font-size: clamp(58px, 7.6vw, 138px);
+  font-size: clamp(38px, 7.6vw, 138px);
   line-height: 0.9;
   font-weight: 950;
   letter-spacing: 0;
@@ -616,6 +616,7 @@ a { text-decoration: none; color: inherit; }
   gap: 0.04em;
   margin: 0 0.025em;
   min-width: 0;
+  white-space: nowrap;
 }
 
 .photo-dot {
@@ -1495,7 +1496,7 @@ a { text-decoration: none; color: inherit; }
   }
 
   .hero-title {
-    font-size: clamp(54px, 12vw, 118px);
+    font-size: clamp(38px, 8.5vw, 118px);
   }
 
   .service-grid,
@@ -1608,7 +1609,17 @@ a { text-decoration: none; color: inherit; }
   }
 
   .hero-title {
-    font-size: clamp(48px, 16vw, 78px);
+    font-size: clamp(32px, 10.5vw, 64px);
+    line-height: 0.95;
+  }
+
+  .hero-line {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .hero-word {
+    white-space: normal;
   }
 
   .hero-copy {
@@ -1691,6 +1702,27 @@ a { text-decoration: none; color: inherit; }
     width: 92px;
     height: 92px;
     margin: 16px 0 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: clamp(28px, 9vw, 48px);
+    line-height: 1;
+  }
+
+  .photo-dot {
+    width: 0.65em;
+    height: 0.65em;
+  }
+
+  .moon-o {
+    width: 0.65em;
+    height: 0.65em;
+  }
+
+  .hero-copy {
+    font-size: 15px;
   }
 }
 

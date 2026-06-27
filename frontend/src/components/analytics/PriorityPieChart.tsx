@@ -40,7 +40,7 @@ export function PriorityPieChart() {
                 </Pie>
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: '1.5px solid var(--border)', fontSize: 12 }}
-                  formatter={(v: number) => [v, 'tasks']}
+                  formatter={(v) => [v, 'tasks']}
                 />
                 <Legend
                   iconType="circle"
