@@ -5,6 +5,7 @@ import { BrandDots, IconStack } from '../components/brand/BrandMarks'
 import { PortfolioSidebar } from '../components/brand/PortfolioSidebar'
 import { useAuthStore } from '../stores/authStore'
 import { PaymentModal } from '../components/payment/PaymentModal'
+import builderPhoto from '../assets/lp.jpeg'
 
 const NAV = [
   {
@@ -251,7 +252,7 @@ export default function LandingPage() {
           </h2>
 
           <article className="letter-panel">
-            <img className="avatar-pin" src="src/assets/lp.jpeg" alt="Builder portrait" />
+            <img className="avatar-pin" src={builderPhoto} alt="Builder portrait" />
             <h2>our journey &amp; vision</h2>
             <p className="accent-text" style={{ fontSize: 28, marginBottom: 70 }}>a note from the builder</p>
             <p>dear friends,</p>
