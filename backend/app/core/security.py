@@ -23,7 +23,11 @@ from app.core.config import get_settings
 settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=False)
 
-LOCAL_JWT_SECRET = settings.SUPABASE_JWT_SECRET or "local-dev-insecure-secret-change-me"
+LOCAL_JWT_SECRET = (
+    settings.SUPABASE_JWT_SECRET
+    or os.environ.get("JWT_SECRET_KEY")
+    or "local-dev-insecure-secret-change-me"
+)
 
 
 def hash_password(password: str, salt: Optional[str] = None) -> str:
