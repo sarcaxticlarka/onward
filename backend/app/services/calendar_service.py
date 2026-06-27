@@ -17,7 +17,7 @@ settings = get_settings()
 GOOGLE_AUTH_BASE = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 # Must use the same URI registered in Google Cloud Console (reuse login callback)
-CALENDAR_REDIRECT_URI = "http://localhost:8000/auth/google/callback"
+CALENDAR_REDIRECT_URI = "https://onward-80yh.onrender.com/auth/google/callback"
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 

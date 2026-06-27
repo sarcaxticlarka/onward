@@ -27,8 +27,8 @@ settings = get_settings()
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
-GOOGLE_LOGIN_REDIRECT = "http://localhost:8000/auth/google/callback"
-FRONTEND_BASE = "http://localhost:5173"
+GOOGLE_LOGIN_REDIRECT = "https://onward-80yh.onrender.com/auth/google/callback"
+FRONTEND_BASE = "https://onward-brown.vercel.app"
 
 
 @router.get("/google")
