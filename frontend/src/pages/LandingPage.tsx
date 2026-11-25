@@ -5,7 +5,7 @@ import { BrandDots, IconStack } from '../components/brand/BrandMarks'
 import { PortfolioSidebar } from '../components/brand/PortfolioSidebar'
 import { useAuthStore } from '../stores/authStore'
 import { PaymentModal } from '../components/payment/PaymentModal'
-import builderPhoto from '../assets/lp.jpeg'
+import builderPhoto from '../assets/lp2.avif'
 
 const NAV = [
   {
